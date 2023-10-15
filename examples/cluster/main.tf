@@ -15,3 +15,17 @@ resource "typesense_cluster" "example" {
   region = "oregon"
   name = "example"
 }
+
+resource "typesense_cluster_api_keys" "example" {
+  cluster_id = typesense_cluster.example.id
+}
+
+output "typesense-admin-cluster-api-key" {
+  value       = typesense_cluster_api_keys.example.admin_key
+  description = "Admin key"
+}
+
+output "typesense-search-only-cluster-api-key" {
+  value       = typesense_cluster_api_keys.example.search_only_key
+  description = "Search Only key"
+}

@@ -129,6 +129,7 @@ func (p *typesenseProvider) DataSources(_ context.Context) []func() datasource.D
 func (p *typesenseProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewClusterResource,
+		NewClusterApiKeysResource,
 	}
 }
 
@@ -151,4 +152,11 @@ type typesenseClusterModel struct {
 	Region                 types.String `tfsdk:"region"`
 	AutoUpgradeCapacity    types.Bool   `tfsdk:"auto_upgrade_capacity"`
 	Status                 types.String `tfsdk:"status"`
+}
+
+type typesenseClusterApiKeysModel struct {
+	ID            types.String `tfsdk:"id"`
+	ClusterId     types.String `tfsdk:"cluster_id"`
+	AdminKey      types.String `tfsdk:"admin_key"`
+	SearchOnlyKey types.String `tfsdk:"search_only_key"`
 }

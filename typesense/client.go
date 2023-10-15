@@ -153,3 +153,41 @@ func (c *typesenseClient) setHeaders(req *http.Request) {
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("X-TYPESENSE-CLOUD-MANAGEMENT-API-KEY", c.key)
 }
+
+type typesenseClusterApiKeys struct {
+	Id            string `json:"id"`
+	ClusterId     string `json:"cluster_id"`
+	AdminKey      string `json:"admin_key"`
+	SearchOnlyKey string `json:"search_only_key"`
+}
+
+type typesenseClusterApiKeysCreateResponse struct {
+	Success        bool                    `json:"success"`
+	ClusterApiKeys typesenseClusterApiKeys `json:"api_keys"`
+}
+
+func (c *typesenseClient) CreateClusterApiKeys(model typesenseClusterApiKeys) (*typesenseClusterApiKeys, error) {
+	clusterApiKeysEndpoint := clusterEndpoint + "/" + model.ClusterId + "/api-keys"
+	req, err := http.NewRequest("POST", clusterApiKeysEndpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+	c.setHeaders(req)
+	hc := http.Client{}
+	resp, err := hc.Do(req)
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	body, err := io.ReadAll(resp.Body)
+	var response typesenseClusterApiKeysCreateResponse
+	if err = json.Unmarshal(body, &response); err != nil {
+		return nil, err
+	}
+	if !response.Success {
+		return nil, errors.New(string(body))
+	}
+	response.ClusterApiKeys.ClusterId = model.ClusterId
+	response.ClusterApiKeys.Id = model.ClusterId
+	return &response.ClusterApiKeys, nil
+}
